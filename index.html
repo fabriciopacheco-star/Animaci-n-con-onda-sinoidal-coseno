@@ -12,7 +12,7 @@
     }
 
     body {
-      background-color: #000000;
+      background-color: #ffffff;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -21,14 +21,15 @@
     }
 
     .canvas-container {
-      border: 2px solid #ff0000;
+      border: 3px solid #ff0000;
       padding: 10px;
-      background-color: #000000;
+      background-color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.15);
     }
 
     canvas {
       display: block;
-      background-color: #000000;
+      background-color: #ffffff;
     }
   </style>
 </head>
@@ -43,58 +44,36 @@
     const ctx = canvas.getContext('2d');
 
     const img = new Image();
-    let isReady = false;
-
-    img.onload = () => {
-      isReady = true;
-    };
-
-    // Intenta cargar la imagen local cerdo-01.png
     img.src = 'cerdo-01.png';
-
-    // Imagen de respaldo incrustada para garantizar visualización inmediata
-    const fallbackImg = new Image();
-    const svgData = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
-      <path fill="#ffffff" stroke="#ff0000" stroke-width="6" d="M 230 90 C 230 90, 248 100, 252 118 C 242 123, 222 135, 208 152 C 180 185, 175 220, 175 220 C 175 220, 142 225, 132 250 C 122 275, 135 305, 148 318 C 152 322, 185 360, 230 380 C 240 384, 255 420, 238 450 C 230 465, 220 480, 220 480 C 220 480, 245 485, 260 450 C 270 428, 272 402, 272 402 C 272 402, 290 440, 310 470 C 322 488, 335 480, 335 480 C 335 480, 312 448, 300 422 C 290 400, 292 388, 292 388 C 320 380, 350 348, 362 318 C 382 268, 350 220, 350 220 C 375 200, 385 162, 358 135 C 330 108, 280 100, 230 90 Z"/>
-      <path fill="#000000" stroke="#ff0000" stroke-width="4" d="M 215 92 Q 250 80 310 115 Q 370 150 380 160 Q 340 180 270 160 Q 210 142 215 92 Z"/>
-      <text x="285" y="135" font-family="Arial, sans-serif" font-weight="900" font-size="38" fill="#ffffff">V</text>
-      <ellipse cx="238" cy="228" rx="14" ry="22" fill="#000000"/>
-      <ellipse cx="308" cy="215" rx="14" ry="18" fill="#000000"/>
-      <ellipse cx="320" cy="270" rx="42" ry="32" fill="#ffffff" stroke="#ff0000" stroke-width="6"/>
-      <ellipse cx="305" cy="270" rx="9" ry="13" fill="#000000"/>
-      <ellipse cx="335" cy="270" rx="9" ry="13" fill="#000000"/>
-    </svg>`;
-    fallbackImg.src = 'data:image/svg+xml;base64,' + btoa(svgData);
 
     let angle = 0;
 
     function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Limpia el canvas con fondo blanco
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       angle += 0.03;
 
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
 
-      // Movimiento en Posición X, Y mediante Seno y Coseno
+      // Modificación de Posición (Eje X con Coseno, Eje Y con Seno)
       const posX = centerX + Math.cos(angle) * 180;
       const posY = centerY + Math.sin(angle * 1.3) * 100;
 
-      // Modificación de Escala mediante Seno
-      const scale = 0.55 + Math.sin(angle * 1.5) * 0.2;
+      // Modificación de Escala (Seno)
+      const scale = 0.6 + Math.sin(angle * 1.5) * 0.25;
 
-      const imgWidth = 240;
-      const imgHeight = 240;
+      const imgWidth = 250;
+      const imgHeight = 250;
 
       ctx.save();
       ctx.translate(posX, posY);
       ctx.scale(scale, scale);
 
-      // Si cargó cerdo-01.png la usa, si no, usa el respaldo vectorial incrustado
-      if (isReady || (img.complete && img.naturalWidth > 0)) {
+      if (img.complete && img.naturalWidth !== 0) {
         ctx.drawImage(img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
-      } else if (fallbackImg.complete) {
-        ctx.drawImage(fallbackImg, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
       }
 
       ctx.restore();
@@ -102,7 +81,13 @@
       requestAnimationFrame(animate);
     }
 
-    animate();
+    img.onload = () => {
+      animate();
+    };
+
+    if (img.complete) {
+      animate();
+    }
   </script>
 </body>
 </html>
