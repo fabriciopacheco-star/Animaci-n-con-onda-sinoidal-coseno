@@ -1,8 +1,54 @@
-<script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animación Canvas</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .canvas-container {
+      border: 2px solid #ff0000;
+      padding: 10px;
+      background-color: #000000;
+    }
+
+    canvas {
+      display: block;
+      background-color: #000000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="canvas-container">
+    <canvas id="mainCanvas" width="800" height="500"></canvas>
+  </div>
+
+  <script>
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
 
     const img = new Image();
+    let imgLoaded = false;
+
+    img.onload = () => {
+      imgLoaded = true;
+    };
+
     img.src = 'cerdo-01.png';
 
     let angle = 0;
@@ -22,15 +68,22 @@
       // Modificación de Escala usando Seno
       const scale = 0.5 + Math.sin(angle * 1.5) * 0.2;
 
-      const imgWidth = 250;
-      const imgHeight = 250;
+      const imgWidth = 220;
+      const imgHeight = 220;
 
       ctx.save();
       ctx.translate(posX, posY);
       ctx.scale(scale, scale);
 
-      if (img.complete && img.naturalWidth !== 0) {
+      if (imgLoaded || (img.complete && img.naturalWidth !== 0)) {
         ctx.drawImage(img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
+      } else {
+        // Figura de respaldo en contorno rojo si la imagen aún no termina de cargar
+        ctx.strokeStyle = '#ff0000';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(0, 0, 70, 0, Math.PI * 2);
+        ctx.stroke();
       }
 
       ctx.restore();
@@ -38,10 +91,7 @@
       requestAnimationFrame(animate);
     }
 
-    // Inicia animación de inmediato y asegura la carga de la imagen
-    img.onload = () => {
-      // Imagen cargada correctamente
-    };
-
     animate();
   </script>
+</body>
+</html>
